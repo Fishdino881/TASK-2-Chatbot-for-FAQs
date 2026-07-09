@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Nimbus Support — FAQ Bot</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDF1F4;
+    --panel:#FFFFFF;
+    --ink:#1B2733;
+    --muted:#6B7A8A;
+    --teal:#2F8F7F;
+    --teal-dark:#256F63;
+    --amber:#E8A23D;
+    --line:#DDE4E9;
+    --bot-bubble:#F2F5F7;
+    --user-bubble:#2F8F7F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:28px 16px;
+  }
+  .app{
+    width:100%;
+    max-width:920px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    display:grid;
+    grid-template-columns:240px 1fr;
+    min-height:640px;
+    box-shadow:0 1px 2px rgba(27,39,51,0.04), 0 12px 32px rgba(27,39,51,0.06);
+  }
+  @media (max-width:680px){
+    .app{grid-template-columns:1fr; min-height:auto;}
+    .sidebar{display:none;}
+  }
+
+  /* Sidebar */
+  .sidebar{
+    background:#F7F9FA;
+    border-right:1px solid var(--line);
+    padding:22px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:9px;
+  }
+  .brand-mark{
+    width:26px;height:26px;border-radius:7px;
+    background:var(--teal);
+    display:flex;align-items:center;justify-content:center;
+    color:white;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;
+  }
+  .brand-name{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:16px;
+  }
+  .brand-sub{
+    font-size:11px;
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:0.02em;
+    margin-top:-14px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--muted);
+    margin-bottom:2px;
+  }
+  .topic-list{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .topic-chip{
+    text-align:left;
+    background:transparent;
+    border:1px solid transparent;
+    border-radius:8px;
+    padding:8px 10px;
+    font-size:13px;
+    color:var(--ink);
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    transition:background 0.12s ease, border-color 0.12s ease;
+  }
+  .topic-chip:hover{
+    background:#EAF3F1;
+    border-color:#D3E6E2;
+  }
+  .method-note{
+    margin-top:auto;
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    color:var(--muted);
+    line-height:1.5;
+    border-top:1px solid var(--line);
+    padding-top:14px;
+  }
+  .method-note b{color:var(--ink);}
+
+  /* Chat pane */
+  .chat-pane{
+    display:flex;
+    flex-direction:column;
+    height:100%;
+  }
+  .chat-header{
+    padding:18px 22px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .chat-header h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:16px;
+    font-weight:600;
+    margin:0;
+  }
+  .status-dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--teal);
+    display:inline-block;
+    margin-right:6px;
+    box-shadow:0 0 0 3px rgba(47,143,127,0.15);
+  }
+  .status{
+    font-size:11.5px;
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+  }
+
+  .messages{
+    flex:1;
+    overflow-y:auto;
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .msg{
+    max-width:78%;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .msg.user{align-self:flex-end; align-items:flex-end;}
+  .msg.bot{align-self:flex-start; align-items:flex-start;}
+
+  .bubble{
+    padding:11px 14px;
+    border-radius:12px;
+    font-size:14px;
+    line-height:1.5;
+  }
+  .msg.user .bubble{
+    background:var(--user-bubble);
+    color:white;
+    border-bottom-right-radius:3px;
+  }
+  .msg.bot .bubble{
+    background:var(--bot-bubble);
+    color:var(--ink);
+    border-bottom-left-radius:3px;
+  }
+
+  .match-meta{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding-left:2px;
+  }
+  .meter{
+    width:64px;
+    height:5px;
+    border-radius:3px;
+    background:#E4EAED;
+    overflow:hidden;
+  }
+  .meter-fill{
+    height:100%;
+    border-radius:3px;
+    background:var(--teal);
+  }
+  .meter-fill.low{background:var(--amber);}
+
+  .suggestions{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-top:2px;
+  }
+  .suggestion-btn{
+    text-align:left;
+    background:white;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:7px 10px;
+    font-size:12.5px;
+    color:var(--teal-dark);
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+  .suggestion-btn:hover{border-color:var(--teal);}
+
+  .composer{
+    border-top:1px solid var(--line);
+    padding:14px 18px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .composer input{
+    flex:1;
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:11px 13px;
+    font-size:14px;
+    font-family:'Inter',sans-serif;
+    outline:none;
+    background:#FAFBFC;
+  }
+  .composer input:focus{border-color:var(--teal);}
+  .composer button{
+    background:var(--teal);
+    color:white;
+    border:none;
+    border-radius:9px;
+    padding:11px 18px;
+    font-size:13.5px;
+    font-weight:600;
+    font-family:'Inter',sans-serif;
+    cursor:pointer;
+    transition:background 0.12s ease;
+  }
+  .composer button:hover{background:var(--teal-dark);}
+  .composer button:disabled{background:#B9C4CA; cursor:default;}
+
+  .typing{
+    display:flex;
+    gap:4px;
+    padding:11px 14px;
+  }
+  .typing span{
+    width:5px;height:5px;border-radius:50%;
+    background:var(--muted);
+    animation:blink 1.2s infinite ease-in-out;
+  }
+  .typing span:nth-child(2){animation-delay:0.15s;}
+  .typing span:nth-child(3){animation-delay:0.3s;}
+  @keyframes blink{0%,80%,100%{opacity:0.25;}40%{opacity:1;}}
+
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:#D3DBE1;border-radius:4px;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="brand-mark">N</div>
+        <div class="brand-name">Nimbus</div>
+      </div>
+      <div class="brand-sub">support desk</div>
+    </div>
+
+    <div>
+      <div class="eyebrow">Browse topics</div>
+      <div class="topic-list" id="topicList"></div>
+    </div>
+
+    <div class="method-note">
+      Matching runs entirely in your browser: text is tokenized, stopwords
+      removed, and <b>TF‑IDF vectors</b> are compared with
+      <b>cosine similarity</b> against 18 FAQs. No server call is made.
+    </div>
+  </aside>
+
+  <section class="chat-pane">
+    <div class="chat-header">
+      <h1>FAQ Assistant</h1>
+      <div class="status"><span class="status-dot"></span>ready</div>
+    </div>
+
+    <div class="messages" id="messages"></div>
+
+    <form class="composer" id="composer">
+      <input type="text" id="input" placeholder="Ask about billing, storage, security…" autocomplete="off">
+      <button type="submit">Send</button>
+    </form>
+  </section>
+</div>
+
+<script>
+/* ------------------------------------------------------------------ */
+/* FAQ data                                                           */
+/* ------------------------------------------------------------------ */
+const FAQS = [
+  {id:1,category:"Getting Started",question:"How do I create a Nimbus account?",answer:"Go to nimbus.io/signup, enter your email and a password, then verify your email address using the link we send you. You'll be prompted to create your first folder as soon as you log in.",keywords:"sign up register new account create"},
+  {id:2,category:"Getting Started",question:"Can I use Nimbus without installing any software?",answer:"Yes. Nimbus works fully in your browser at app.nimbus.io. Installing the desktop or mobile app is optional and only needed if you want automatic folder syncing.",keywords:"web browser without app install no download"},
+  {id:3,category:"Getting Started",question:"Which devices and platforms does Nimbus support?",answer:"Nimbus has apps for Windows, macOS, Linux, iOS, and Android, plus a web app that works in any modern browser.",keywords:"platforms os windows mac linux iphone android compatible"},
+  {id:4,category:"Billing & Plans",question:"What plans does Nimbus offer?",answer:"Nimbus has three plans: Free (5GB), Plus ($4.99/month, 200GB), and Pro ($12.99/month, 2TB with advanced sharing controls). All paid plans include a 14-day free trial.",keywords:"pricing plans cost price tiers subscription options"},
+  {id:5,category:"Billing & Plans",question:"How do I cancel my subscription?",answer:"Open Settings > Billing > Manage Subscription and select Cancel Plan. You'll keep paid features until the end of your current billing cycle, then automatically move to the Free plan.",keywords:"cancel stop end subscription unsubscribe downgrade"},
+  {id:6,category:"Billing & Plans",question:"Do you offer refunds?",answer:"We offer a full refund within 14 days of your first payment on a new subscription. Contact support@nimbus.io with your account email to request one.",keywords:"refund money back reimburse return payment charge"},
+  {id:7,category:"Billing & Plans",question:"Can I switch between monthly and yearly billing?",answer:"Yes, go to Settings > Billing > Change Billing Cycle. Switching to yearly applies immediately and gives you a discount; switching to monthly takes effect at your next renewal.",keywords:"annual monthly yearly billing cycle switch change discount"},
+  {id:8,category:"Storage & Sync",question:"How much storage do I get on the free plan?",answer:"The Free plan includes 5GB of storage. You can earn up to an extra 2GB by referring friends who sign up and verify their account.",keywords:"free storage space gb limit how much"},
+  {id:9,category:"Storage & Sync",question:"Why is my folder not syncing?",answer:"Syncing usually pauses because of a weak internet connection, a full local disk, or the app being paused manually. Check the sync icon in your system tray or menu bar, then try Settings > Sync > Resume Sync.",keywords:"sync not working stuck updating between devices files stopped syncing"},
+  {id:10,category:"Storage & Sync",question:"Is there a file size limit for uploads?",answer:"Free and Plus accounts can upload files up to 10GB each. Pro accounts can upload files up to 100GB each.",keywords:"file size limit max upload large"},
+  {id:11,category:"Storage & Sync",question:"Can I recover a file I deleted by accident?",answer:"Yes. Deleted files stay in your Trash for 30 days and can be restored from there. After 30 days they're permanently removed unless you're on the Pro plan, which keeps a 180-day version history.",keywords:"recover restore undelete deleted file trash accident"},
+  {id:12,category:"Storage & Sync",question:"How do I share a folder with someone else?",answer:"Right-click any folder and choose Share, then enter the person's email or generate a public link. You can set the link to view-only or allow editing, and add an expiration date on the Pro plan.",keywords:"share sharing link collaborate invite folder access"},
+  {id:13,category:"Security & Privacy",question:"Is my data encrypted?",answer:"Yes. Files are encrypted with AES-256 while stored on our servers and with TLS 1.3 while in transit between your device and Nimbus.",keywords:"encryption encrypted secure security data protection"},
+  {id:14,category:"Security & Privacy",question:"Does Nimbus support two-factor authentication?",answer:"Yes, you can enable two-factor authentication under Settings > Security using an authenticator app or SMS codes. We strongly recommend turning it on.",keywords:"two factor authentication 2fa mfa login security code"},
+  {id:15,category:"Security & Privacy",question:"Who can see the files I store on Nimbus?",answer:"Only you and anyone you explicitly share a file or folder with can see it. Nimbus staff cannot access the contents of your files except in rare cases required by law, which are logged and disclosed in our transparency report.",keywords:"privacy who can see access staff view files"},
+  {id:16,category:"Troubleshooting",question:"I forgot my password, how do I reset it?",answer:"Click Forgot Password on the login screen and enter your account email. We'll send a reset link that's valid for one hour.",keywords:"forgot password reset login cant login locked out"},
+  {id:17,category:"Troubleshooting",question:"The desktop app is running slowly, what should I do?",answer:"Try pausing sync, restarting the app, and checking for updates under Help > Check for Updates. If it's still slow, large folders with many small files can be excluded from sync in Settings > Selective Sync.",keywords:"slow lag performance freeze laggy app issue"},
+  {id:18,category:"Troubleshooting",question:"How do I contact customer support?",answer:"Email support@nimbus.io or use the chat bubble in the bottom-right of the web app. Pro plan customers get priority support with a typical response time under 2 hours.",keywords:"contact support help human agent talk to someone"}
+];
+
+const CONFIDENCE_THRESHOLD = 0.18;
+
+/* ------------------------------------------------------------------ */
+/* Step 2: Preprocess text (tokenize, remove stopwords, light stem)   */
+/* ------------------------------------------------------------------ */
+const STOPWORDS = new Set(("a an the is are was were be been being do does did "+
+  "i you he she it we they my your his her its our their me him them us "+
+  "this that these those to of in on at for with without and or but if "+
+  "so as by from up down out about into over under again further then "+
+  "once here there when where why how all any both each few more most "+
+  "other some such no nor not only own same than too very can will just "+
+  "should now what which who whom does don doesn didn").split(" "));
+
+function simpleStem(word){
+  // light suffix stripping, not a full Porter stemmer, but reduces
+  // "syncing"/"synced"/"syncs" -> "sync" style variance for matching
+  return word
+    .replace(/(ing|ings)$/,'')
+    .replace(/(edly|ly)$/,'')
+    .replace(/(ed|es)$/,'')
+    .replace(/s$/,'');
+}
+
+function tokenize(text){
+  const words = text.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean);
+  return words
+    .filter(w => !STOPWORDS.has(w))
+    .map(simpleStem)
+    .filter(w => w.length > 1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Step 3: TF-IDF + cosine similarity matching                        */
+/* ------------------------------------------------------------------ */
+function buildNgrams(tokens){
+  const grams = [...tokens];
+  for(let i=0;i<tokens.length-1;i++) grams.push(tokens[i]+'_'+tokens[i+1]);
+  return grams;
+}
+
+class FaqMatcher{
+  constructor(faqs){
+    this.faqs = faqs;
+    this.docsTokens = faqs.map(f => buildNgrams(tokenize(f.question+' '+f.keywords)));
+    this.vocab = [...new Set(this.docsTokens.flat())];
+    this.idf = this._computeIdf();
+    this.docVectors = this.docsTokens.map(toks => this._vectorize(toks));
+  }
+  _computeIdf(){
+    const N = this.docsTokens.length;
+    const df = {};
+    this.vocab.forEach(term => {
+      df[term] = this.docsTokens.filter(doc => doc.includes(term)).length;
+    });
+    const idf = {};
+    this.vocab.forEach(term => { idf[term] = Math.log((1+N)/(1+df[term])) + 1; });
+    return idf;
+  }
+  _vectorize(tokens){
+    const tf = {};
+    tokens.forEach(t => { tf[t] = (tf[t]||0)+1; });
+    const vec = {};
+    let norm = 0;
+    Object.keys(tf).forEach(term => {
+      if(this.idf[term] === undefined) return;
+      const w = (tf[term]/tokens.length) * this.idf[term];
+      vec[term] = w;
+      norm += w*w;
+    });
+    norm = Math.sqrt(norm) || 1;
+    Object.keys(vec).forEach(k => vec[k] /= norm);
+    return vec;
+  }
+  _cosine(a,b){
+    let dot = 0;
+    const keys = Object.keys(a).length < Object.keys(b).length ? a : b;
+    Object.keys(keys).forEach(k => { if(a[k] && b[k]) dot += a[k]*b[k]; });
+    return dot;
+  }
+  rank(query){
+    const qTokens = buildNgrams(tokenize(query));
+    const qVec = this._vectorize(qTokens);
+    return this.faqs
+      .map((faq,i) => ({faq, score:this._cosine(qVec, this.docVectors[i])}))
+      .sort((a,b) => b.score-a.score);
+  }
+  bestMatch(query){
+    const ranked = this.rank(query);
+    return ranked[0];
+  }
+}
+
+const matcher = new FaqMatcher(FAQS);
+
+/* ------------------------------------------------------------------ */
+/* Step 4: UI — render sidebar, chat, and best-match answers          */
+/* ------------------------------------------------------------------ */
+const messagesEl = document.getElementById('messages');
+const composer = document.getElementById('composer');
+const input = document.getElementById('input');
+const topicListEl = document.getElementById('topicList');
+
+const categories = [...new Set(FAQS.map(f=>f.category))];
+categories.forEach(cat => {
+  const btn = document.createElement('button');
+  btn.className = 'topic-chip';
+  btn.textContent = cat;
+  btn.onclick = () => {
+    const sample = FAQS.find(f=>f.category===cat).question;
+    input.value = sample;
+    input.focus();
+  };
+  topicListEl.appendChild(btn);
+});
+
+function addMessage(role, html){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + role;
+  wrap.innerHTML = html;
+  messagesEl.appendChild(wrap);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  return wrap;
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function botAnswer(query){
+  const ranked = matcher.rank(query);
+  const best = ranked[0];
+
+  if(!best || best.score < CONFIDENCE_THRESHOLD){
+    const suggestions = ranked.slice(0,3).map(r =>
+      `<button class="suggestion-btn" data-q="${escapeHtml(r.faq.question)}">${escapeHtml(r.faq.question)}</button>`
+    ).join('');
+    addMessage('bot', `
+      <div class="bubble">I'm not fully sure I have that one. Here are a few FAQs that might be related:</div>
+      <div class="suggestions">${suggestions}</div>
+    `);
+  } else {
+    const pct = Math.min(100, Math.round(best.score*100));
+    const low = best.score < 0.35 ? 'low' : '';
+    addMessage('bot', `
+      <div class="bubble">${escapeHtml(best.faq.answer)}</div>
+      <div class="match-meta">
+        matched "${escapeHtml(best.faq.question)}"
+        <span class="meter"><span class="meter-fill ${low}" style="width:${pct}%"></span></span>
+        cos_sim=${best.score.toFixed(2)}
+      </div>
+    `);
+  }
+  attachSuggestionHandlers();
+}
+
+function attachSuggestionHandlers(){
+  document.querySelectorAll('.suggestion-btn').forEach(btn => {
+    btn.onclick = () => {
+      const q = btn.getAttribute('data-q');
+      input.value = q;
+      composer.requestSubmit();
+    };
+  });
+}
+
+function showTyping(){
+  return addMessage('bot', `<div class="bubble typing"><span></span><span></span><span></span></div>`);
+}
+
+composer.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const query = input.value.trim();
+  if(!query) return;
+  addMessage('user', `<div class="bubble">${escapeHtml(query)}</div>`);
+  input.value = '';
+
+  const typingEl = showTyping();
+  setTimeout(() => {
+    typingEl.remove();
+    botAnswer(query);
+  }, 350 + Math.random()*250);
+});
+
+// Greeting
+addMessage('bot', `
+  <div class="bubble">Hi! I'm the Nimbus FAQ bot. Ask me about accounts, billing, storage, security, or troubleshooting — or tap a topic on the left.</div>
+`);
+</script>
+
+</body>
+</html>
